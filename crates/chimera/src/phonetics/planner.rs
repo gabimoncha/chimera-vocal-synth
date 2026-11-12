@@ -474,9 +474,9 @@ fn palatal_body(def: &PhonemeDef, body: BodyMix) -> Option<ArticPatch> {
 
 /// Fast speech: segments shrink by the rate, so the gestures' ramps and release holds must shrink
 /// too. With fixed ones, a stop's closure outlasted the short vowel after it: at rate 1.8 the /ɑ/
-/// of "ɑtɑtɑ" never opened (tests/fast_speech.rs).
+/// of "ɑtɑtɑ" never opened (tests/fast_speech.rs). Pitch and breath gestures keep their ramps.
 fn shorten_timing(gestures: &mut [Gesture], rate: f64) {
-    for g in gestures.iter_mut() {
+    for g in gestures.iter_mut().filter(|g| !g.targets.has(ControlKey::F0) && !g.targets.has(ControlKey::BREATH)) {
         g.ramp_in /= rate;
         g.ramp_out /= rate;
         g.release_hold = g.release_hold.map(|h| h / rate);
